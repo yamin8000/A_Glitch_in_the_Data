@@ -1,0 +1,3 @@
+include ':A_Glitch_in_the_String'
+include ':app'
+rootProject.name = "Form Validator Test"
