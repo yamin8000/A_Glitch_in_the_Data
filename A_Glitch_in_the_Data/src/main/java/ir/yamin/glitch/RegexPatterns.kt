@@ -2,6 +2,7 @@ package ir.yamin.glitch
 
 object RegexPatterns {
     
+    const val WHITE_SPACE = """\s+"""
     const val PERSIAN_NUMBERS = """[۰-۹]+"""
     const val ARABIC_NUMBERS = """[٠-٩]+"""
     const val PERSIAN_ALPHABET = """([\u0621-\u0659]+|[\u0670-\u06cc]+)+"""

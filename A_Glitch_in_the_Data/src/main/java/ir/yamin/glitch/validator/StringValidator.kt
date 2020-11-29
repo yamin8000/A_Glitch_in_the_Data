@@ -8,34 +8,39 @@ class StringValidator : DataValidator() {
     private var stringsWithValidity : MutableMap<String?, Boolean> = mutableMapOf()
     private var stringWithRule = mutableMapOf<String, List<Rule>>()
     
-    fun addString(string : String, vararg varString : String) = this.apply {
+    override fun ignoreWhiteSpace(ignore : Boolean) = this.apply {
+        super.ignoreWhiteSpace(ignore)
+    }
+    
+    fun add(string : String, vararg varString : String) = this.apply {
         strings.addAll(varString)
         strings.add(string)
     }
     
-    fun addString(stringList : List<String>) = this.apply { strings.addAll(stringList) }
+    fun add(stringList : List<String>) = this.apply { strings.addAll(stringList) }
     
-    fun addStringWithRule(string : String, rule : Rule, vararg varRule : Rule) = this.apply {
+    fun addWithRule(string : String, rule : Rule, vararg varRule : Rule) = this.apply {
         stringWithRule[string] = listOf(rule).plus(varRule)
         isMultiRule = true
     }
     
-    fun addStringWithRule(stringAndRule : Map<String, Rule>) = this.apply {
+    fun addWithRule(stringAndRule : Map<String, Rule>) = this.apply {
         stringWithRule.putAll(stringAndRule.entries.associate { pair -> pair.key to listOf(pair.value) })
         isMultiRule = true
     }
     
-    fun addStringWithRule(string : String, rules : List<Rule>) = this.apply {
+    fun addWithRule(string : String, rules : List<Rule>) = this.apply {
         stringWithRule[string] = rules
         isMultiRule = true
     }
     
-    fun giveMeMyStrings() : MutableList<String> = strings
+    //    fun giveMeMyStrings() : MutableList<String> = strings
+    //
+    //    fun giveMeMyMaps() : MutableMap<String, List<Rule>> = stringWithRule
+    //
+    //    fun giveMeMyStringValidity() = stringsWithValidity
     
-    fun giveMeMyMaps() : MutableMap<String, List<Rule>> = stringWithRule
-    
-    fun giveMeMyStringValidity() = stringsWithValidity
-    
+    //todo refactoring methods
     override fun checkSingleGlobalRule() : Boolean {
         for (string in strings) checkRuleHandler(string, singleRule)
         return validity

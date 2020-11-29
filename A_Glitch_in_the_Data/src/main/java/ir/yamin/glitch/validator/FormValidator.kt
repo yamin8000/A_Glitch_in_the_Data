@@ -12,13 +12,17 @@ class FormValidator : DataValidator() {
     private var elements = mutableListOf<FormElement>()
     private var elementAndRule = mutableMapOf<FormElement, List<Rule>>()
     
+    override fun ignoreWhiteSpace(ignore : Boolean) = this.apply {
+        super.ignoreWhiteSpace(ignore)
+    }
+    
     fun giveMeSomething() : MutableMap<String, Boolean> {
         val map = mutableMapOf<String, Boolean>()
         for (element in elements) map[element.name] = element.validity
         return map
     }
     
-    fun addField(element : FormElement?, vararg varElement : FormElement?) = this.apply {
+    fun add(element : FormElement?, vararg varElement : FormElement?) = this.apply {
         if (element == null) throw NullPointerException()
         elements.add(element)
         varElement.forEach { element ->
@@ -27,23 +31,20 @@ class FormValidator : DataValidator() {
         }
     }
     
-    fun addField(elementList : List<FormElement?>) = this.apply {
+    fun add(elementList : List<FormElement?>) = this.apply {
         elementList.forEach { element ->
             if (element == null) throw NullPointerException()
             elements.add(element)
         }
     }
     
-    fun addFieldWithRule(element : FormElement?, rule : Rule, vararg varRules : Rule) = this.apply {
+    fun addWithRule(element : FormElement?, rule : Rule, vararg rules : Rule) = this.apply {
         if (element == null) throw NullPointerException()
-        val rules = mutableListOf<Rule>()
-        rules.add(rule)
-        if (varRules.isNotEmpty()) rules.addAll(varRules)
-        elementAndRule[element] = rules
+        elementAndRule[element] = listOf(rule).plus(rules)
         isMultiRule = true
     }
     
-    fun addFieldWithRule(elementAndRule : Map<FormElement?, Rule>) = this.apply {
+    fun addWithRule(elementAndRule : Map<FormElement?, Rule>) = this.apply {
         this.elementAndRule.putAll(elementAndRule.entries.associate { entry ->
             if (entry.key == null) throw NullPointerException()
             entry.key!! to listOf(entry.value)
@@ -51,26 +52,26 @@ class FormValidator : DataValidator() {
         isMultiRule = true
     }
     
-    fun addFieldWithRule(element : FormElement?, rules : List<Rule>) = this.apply {
+    fun addWithRule(element : FormElement?, rules : List<Rule>) = this.apply {
         if (element == null || rules.isEmpty()) throw NullPointerException()
         elementAndRule[element] = rules
         isMultiRule = true
     }
     
-    //    fun addFieldWithRule(element : FormElement?, vararg varRules : Rule) = this.apply {
-    //        if (element == null) throw NullPointerException()
-    //        elementAndRule[element] = listOf(*varRules)
-    //        isMultiRule = true
-    //    }
-    
     override fun withRule(rule : Rule) = this.apply {
         super.withRule(rule)
         for (element in elements) elementAndRule[element] = listOf(rule)
     }
-    //todo preventing user from adding zero rules
-    override fun withRule(vararg varRule : Rule) = this.apply {
-        super.withRule(*varRule)
-        for (element in elements) elementAndRule[element] = listOf(*varRule)
+    
+    override fun withRule(rule : Rule, vararg varRule : Rule) = this.apply {
+        val listOfAllRules = listOf(rule).plus(varRule)
+        super.withRule(listOfAllRules)
+        for (element in elements) elementAndRule[element] = listOfAllRules
+    }
+    
+    fun withRule(ruleList : MutableList<Rule>) = this.apply {
+        super.withRule(ruleList)
+        for (element in elements) elementAndRule[element] = ruleList
     }
     
     override fun checkSingleGlobalRule() = check()
@@ -80,10 +81,10 @@ class FormValidator : DataValidator() {
     private fun check() : Boolean {
         for (element in elementAndRule) {
             for (rule in element.value) {
-                element.key.validity = checkRule(element.key.getEditText().value(), rule)
+                element.key.validity = checkRule(element.key.getEditText()?.value().orEmpty(), rule)
                 validity = validity && element.key.validity
                 if (!element.key.validity && element.key.isErrorEnabled) element.key.showError()
-                if (element.key.validity && element.key.isInputLayout) element.key.clearError()
+                //if (element.key.validity && element.key.isInputLayout) element.key.clearError()
             }
         }
         return validity
@@ -94,6 +95,7 @@ class FormValidator : DataValidator() {
             element.key.getEditText()?.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s : CharSequence?, start : Int, count : Int, after : Int) {
                     /* no-op */
+                    if (element.key.isInputLayout) element.key.clearError()
                 }
     
                 override fun onTextChanged(s : CharSequence?, start : Int, before : Int, count : Int) {

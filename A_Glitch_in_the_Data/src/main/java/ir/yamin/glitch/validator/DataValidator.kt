@@ -1,5 +1,6 @@
 package ir.yamin.glitch.validator
 
+import ir.yamin.glitch.RegexPatterns.WHITE_SPACE
 import ir.yamin.glitch.rules.CustomRule
 import ir.yamin.glitch.rules.RegexRule
 import ir.yamin.glitch.rules.Rule
@@ -20,18 +21,29 @@ abstract class DataValidator {
     protected lateinit var singleRule : Rule
     protected var singleRules = mutableListOf<Rule>()
     protected var validity = true
+    private var isIgnoringWhiteSpace = false
+    
+    private var min : Int? = null
+    private var max : Int? = null
     
     private fun ruleCollision() : Unit = throw IllegalStateException(
             "It's either multi rule or single rule, you cannot set them both!")
+    
+    open fun ignoreWhiteSpace(ignore : Boolean) = this.apply { isIgnoringWhiteSpace = ignore }
     
     open fun withRule(rule : Rule) = this.apply {
         isSingleGlobalRule = true
         singleRule = rule
     }
     
-    open fun withRule(vararg varRule : Rule) = this.apply {
+    open fun withRule(rule : Rule, vararg varRule : Rule) = this.apply {
         isMultipleGlobalRule = true
         singleRules.addAll(varRule)
+    }
+    
+    open fun withRule(rules : List<Rule>) = this.apply {
+        isMultipleGlobalRule = true
+        singleRules.addAll(rules)
     }
     
     fun isValid() : Boolean {
@@ -45,38 +57,49 @@ abstract class DataValidator {
     }
     
     protected fun checkRule(string : String, rule : Rule) : Boolean {
+        minMaxParadox(rule)
+        val sanitizedInput = if (isIgnoringWhiteSpace) string.replace(Regex(WHITE_SPACE), "") else string
         return when (rule) {
-            Rules.PersianText -> isPersianText(string)
-            Rules.ContainsPersianText -> containsPersianText(string)
+            Rules.PersianText -> isPersianText(sanitizedInput)
+            Rules.ContainsPersianText -> containsPersianText(sanitizedInput)
     
-            Rules.PersianNumber -> isPersianNumber(string)
-            Rules.ContainsPersianNumber -> containsPersianNumber(string)
+            Rules.PersianNumber -> isPersianNumber(sanitizedInput)
+            Rules.ContainsPersianNumber -> containsPersianNumber(sanitizedInput)
     
-            Rules.ArabicNumber -> isArabicNumber(string)
-            Rules.ContainsArabicNumber -> containsArabicNumber(string)
+            Rules.ArabicNumber -> isArabicNumber(sanitizedInput)
+            Rules.ContainsArabicNumber -> containsArabicNumber(sanitizedInput)
     
-            Rules.Digit -> isDigit(string)
-            Rules.ContainsDigit -> containsDigit(string)
+            Rules.Digit -> isDigit(sanitizedInput)
+            Rules.ContainsDigit -> containsDigit(sanitizedInput)
     
-            Rules.AlphaNumeric -> isAlphaNumeric(string)
-            Rules.ContainsAlphaNumeric -> containsAlphaNumeric(string)
+            Rules.AlphaNumeric -> isAlphaNumeric(sanitizedInput)
+            Rules.ContainsAlphaNumeric -> containsAlphaNumeric(sanitizedInput)
     
-            Rules.Decimal -> isDecimal(string)
-            Rules.ContainsDecimal -> containsDecimal(string)
+            Rules.Decimal -> isDecimal(sanitizedInput)
+            Rules.ContainsDecimal -> containsDecimal(sanitizedInput)
     
-            Rules.IranMobile -> isIranMobile(string)
-            Rules.ContainsIranMobile -> containsIranMobile(string)
+            Rules.IranMobile -> isIranMobile(sanitizedInput)
+            Rules.ContainsIranMobile -> containsIranMobile(sanitizedInput)
     
-            Rules.IranNationalCode -> isIranNationalCode(string)
+            Rules.IranNationalCode -> isIranNationalCode(sanitizedInput)
     
-            is Rules.Length.Exact -> isExactLength(string, rule.length)
-            is Rules.Length.Max -> isMaxLength(string, rule.max)
-            is Rules.Length.Min -> isMinLength(string, rule.min)
+            is Rules.Length.Exact -> isExactLength(sanitizedInput, rule.length)
+            is Rules.Length.Max -> isMaxLength(sanitizedInput, rule.max)
+            is Rules.Length.Min -> isMinLength(sanitizedInput, rule.min)
     
-            is RegexRule -> RegexValidity(string, rule.pattern).isValid()
+            is RegexRule -> RegexValidity(sanitizedInput, rule.pattern).isValid()
     
             is CustomRule -> rule.logic()
             else -> false
+        }
+    }
+    
+    private fun minMaxParadox(rule : Rule) {
+        if (min != null && max != null && min!! > max!!) {
+            throw IllegalStateException("Minimum cannot be greater than Maximum!")
+        } else {
+            if (rule is Rules.Length.Min) min = rule.min
+            if (rule is Rules.Length.Max) max = rule.max
         }
     }
     

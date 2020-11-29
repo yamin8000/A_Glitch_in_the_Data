@@ -2,6 +2,7 @@ package ir.yamin.glitch
 
 import ir.yamin.glitch.rules.CustomRule
 import ir.yamin.glitch.rules.RegexRule
+import ir.yamin.glitch.rules.Rules
 import ir.yamin.glitch.validator.StringValidator
 
 fun main() {
@@ -72,10 +73,13 @@ fun main() {
     
     val test : String? = null
     val test2 : String? = null
-    val ss = StringValidator().addStringWithRule("abab13123123", RegexRule("(ab)+.+"))
-    val sd = StringValidator().addStringWithRule("abab13123123", CustomRule {
+    val ss = StringValidator().addWithRule("abab13123123", RegexRule("(ab)+.+"))
+    val sd = StringValidator().addWithRule("abab13123123", CustomRule {
     
         return@CustomRule false
     })
-    println(sd.isValid())
+    //println(sd.isValid())
+    val yeah = StringValidator().add("12132").add("212111")
+        .withRule(Rules.Length.Min(4), Rules.Length.Max(10), Rules.Digit)
+    println(yeah.isValid())
 }
