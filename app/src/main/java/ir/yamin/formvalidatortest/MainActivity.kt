@@ -8,10 +8,11 @@ import com.google.android.material.textfield.TextInputLayout
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
-import ir.yamin.glitch.FormElement
-import ir.yamin.glitch.FormValidator
-import ir.yamin.glitch.rules.LengthRule
-import ir.yamin.glitch.rules.Rule
+import ir.yamin.glitch.form.FormElement
+import ir.yamin.glitch.rules.CustomRule
+import ir.yamin.glitch.rules.Rules
+import ir.yamin.glitch.validator.FormValidator
+import ir.yamin.glitch.validator.StringValidator
 
 class MainActivity : AppCompatActivity() {
     
@@ -34,21 +35,25 @@ class MainActivity : AppCompatActivity() {
         val form = FormValidator()
         
         form.addFieldWithRule(FormElement(edittext1, "name").error("alpha numeric min 3 max 10"),
-                              Rule.AlphaNumeric, LengthRule().setMin(3).setMax(10))
-        
-        form.addFieldWithRule(FormElement(edittext2, "password").error("digit only"), Rule.Digit)
-        
-        form.addFieldWithRule(FormElement(edittext3, "code").error("کد ملی نیست"), Rule.IranNationalCode)
-        
-        form.addFieldWithRule(FormElement(input, "mobile").error("not mobile"), Rule.IranMobile)
-        
+                              Rules.AlphaNumeric, Rules.Length.Min(3), Rules.Length.Max(10))
+    
+        form.addFieldWithRule(FormElement(edittext2, "password").error("digit only"), Rules.Digit)
+    
+        form.addFieldWithRule(FormElement(edittext3, "code").error("کد ملی نیست"), Rules.IranNationalCode)
+    
+        form.addFieldWithRule(FormElement(input, "mobile").error("not mobile"), Rules.IranMobile)
+    
         form.activeCheck()
-        
-        
+    
+    
         val button = findViewById<Button>(R.id.button)
         button.setOnClickListener {
             Logger.d(form.isValid())
             Logger.d(form.giveMeSomething())
         }
+    }
+    
+    private fun test() : Boolean {
+        return false
     }
 }
