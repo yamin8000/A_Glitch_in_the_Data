@@ -26,22 +26,23 @@
 Simple usage:
 
 Forms
-
+```kotlin
     val element = FormElement(edittext1)  
     val form = FormValidator()  
     form.add(element).withRule(Rules.Digit())  
     Log.d("TAG","${form.isValid()}")
+```
 This is true when text is digit only.
 
 Strings
-
+```kotlin
     val stringValidator = StringValidator().addWithRule("111", Rules.Digit())  
       .addWithRule("a1aa", Rules.Decimal())  
     println(stringValidator.isValid())
-
+```
 This simple type of validation is passive and only should be used for debugging mode or for checking strings, but you can validate your form in active way, using active way library will manufacture a `TextWatcher` for each of elements and as you type validation is checked and error message is shown.
 
-
+```kotlin
     val form = FormValidator() 
     form.addWithRule(FormElement(edittext1).error("sss"),  
       Rules.Length.Min(3, "You must enter at least 3 characters"),  
@@ -54,34 +55,39 @@ This simple type of validation is passive and only should be used for debugging 
     form.addSubmitButton(findViewById(R.id.submitButton))  
       
     form.activeCheck()
-
+```
 Elements also can have name which are used when you want to know exactly which element is valid or not, where `states` is a `MutabeMap<String, Boolean>` with a pair of element name and element validity.
-
+```kotlin
     FormElement(edittext1, "myelementname")
     val states = form.getFormState()
+```
 Elements can have general error message:
 
+```kotlin
     FormElement(...).error("enter a proper input")
-    
+```
 Alternatively error messages can be different for each rule:
-
+```kotlin
     form.addWithRule(FormElement(edittext2),  
       Rules.Length.Min(10, "You can not enter less than 10 characters"),  
       Rules.Digit("You can only enter digits"))
-
+```
 For the sake of brevity and convenience elements and rules can be added in different kind of ways:
 you can pass a single element, `variable argument` of elements or a `List` of elements
-
+```kotlin
     form.add(element,element,...)
     form.add(elementList)
+```
 Above format is also applied when adding elements with rule or alternatively you can create a `Map` with pair of element and rules and pass it as an argument.
 
 One thing to consider is you can  also add (a) rule/rules as global rule for elements but you should not combine this with different rules for each element. you either set a global rule for all elements or set a different rule for each element.
-
+```kotlin
     form.add(...).add(...).withRule(...)
+```
   For forms a submit button also can be added, adding a submit button makes it disabled. submit button will be enabled when every element of form is valid.
-
+```kotlin
       form.addSubmitButton(button)
+```
 Currently following Rules are supported:
 
  - [x] Digit - (1, 2225, 12)
@@ -102,16 +108,18 @@ Currently following Rules are supported:
  - [ ] ...
 
 You can use custom rule like this:
-
+```kotlin
     form.addWithRule(FormElement(input), Rules.Custom {  
       val isValid = false  
       //your logic here  
       return@Custom isValid  
     })
+```
 #### Notice
 This library doesn't delete whitespace so `125` is a digit but `111 25` is not a digit (sometime mobile number is typed in that format with spaces between every three number) if you want to check if the second one is digit or not you either should use `ContainsDigit` rule or force library to ignore whitespace which I do not recommend because of obvious reasons.
-
+```kotlin
     val form = FormValidator().ignoreWhiteSpace(true)
+```
 #### Null Safety
 I tried my best to make it null safe but you can always force-pass a null argument, if you try that library will slap you in the face with a `NullPointerException`.
 
@@ -119,7 +127,7 @@ I tried my best to make it null safe but you can always force-pass a null argume
 ### Gradle
 **Step 1.** Add the JitPack repository to your build file
 Add it in your root build.gradle at the end of repositories:
-```css
+```groovy
 allprojects {
 	repositories {
 		...
@@ -128,7 +136,7 @@ allprojects {
 }
 ```
 **Step 2.** Add the dependency
-```css
+```groovy
 dependencies {
 	implementation 'com.github.yamin8000:A_Glitch_in_the_Data:0.0.2'
 }
