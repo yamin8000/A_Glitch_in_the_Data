@@ -1,7 +1,5 @@
 package ir.yamin.glitch
 
-import ir.yamin.glitch.rules.CustomRule
-import ir.yamin.glitch.rules.RegexRule
 import ir.yamin.glitch.rules.Rules
 import ir.yamin.glitch.validator.StringValidator
 
@@ -71,15 +69,20 @@ fun main() {
     //    println(testTest.isValid())
     //    println(testTest.giveMeMyStringValidity())
     
-    val test : String? = null
-    val test2 : String? = null
-    val ss = StringValidator().addWithRule("abab13123123", RegexRule("(ab)+.+"))
-    val sd = StringValidator().addWithRule("abab13123123", CustomRule {
+    /*    val test : String? = null
+        val test2 : String? = null
+        val ss = StringValidator().addWithRule("abab13123123", Rules.Regex("(ab)+.+"))
+        val sd = StringValidator().addWithRule("abab13123123", Rules.Custom {
+        
+            return@Custom false
+        })
+        //println(sd.isValid())
+        val yeah = StringValidator().add("12132").add("212111")
+            .withRule(Rules.Length.Min(4), Rules.Length.Max(10), Rules.Digit)
+        println(yeah.isValid())*/
     
-        return@CustomRule false
-    })
-    //println(sd.isValid())
-    val yeah = StringValidator().add("12132").add("212111")
-        .withRule(Rules.Length.Min(4), Rules.Length.Max(10), Rules.Digit)
+    val yeah = StringValidator().addWithRule("111", Rules.Digit()).addWithRule("a1aa", Rules.Decimal())
+    
     println(yeah.isValid())
+    println(yeah.giveMeMyStringValidity())
 }

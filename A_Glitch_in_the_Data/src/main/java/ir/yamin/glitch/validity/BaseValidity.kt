@@ -1,6 +1,6 @@
 package ir.yamin.glitch.validity
 
-internal abstract class Validity(input : String) {
+internal abstract class BaseValidity(input : String) {
     
     protected var input = ""
     

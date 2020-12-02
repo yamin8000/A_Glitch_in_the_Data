@@ -1,4 +1,4 @@
-package ir.yamin.glitch
+package ir.yamin.glitch.util
 
 object RegexPatterns {
     
@@ -10,6 +10,4 @@ object RegexPatterns {
     const val IRAN_MOBILE_NUMBERS = """([+]98|0098|0)?-?(9\d{2})-?(\d{3})-?(\d{4})"""
     const val ALPHA_NUMERIC = """([A-Za-z0-9])+"""
     const val DECIMAL = """\d*\.\d+"""
-    const val EMAIL = """ """
-    const val URL = """ """
 }

@@ -1,9 +1,9 @@
 package ir.yamin.glitch.validity.iran
 
-import ir.yamin.glitch.RegexPatterns
-import ir.yamin.glitch.validity.Validity
+import ir.yamin.glitch.util.RegexPatterns
+import ir.yamin.glitch.validity.BaseValidity
 
-internal class IranNationalCodeValidity(string : String) : Validity(string) {
+internal class IranNationalCodeValidity(string : String) : BaseValidity(string) {
     
     override fun isValid() : Boolean {
         var validity = false

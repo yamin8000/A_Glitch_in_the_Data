@@ -1,10 +1,12 @@
 package ir.yamin.glitch.validator
 
-import ir.yamin.glitch.RegexPatterns.WHITE_SPACE
-import ir.yamin.glitch.rules.CustomRule
-import ir.yamin.glitch.rules.RegexRule
 import ir.yamin.glitch.rules.Rule
 import ir.yamin.glitch.rules.Rules
+import ir.yamin.glitch.util.CONSTANTS.MINIMUM_MAXIMUM
+import ir.yamin.glitch.util.CONSTANTS.RULE_COLLISION
+import ir.yamin.glitch.util.RegexPatterns.WHITE_SPACE
+import ir.yamin.glitch.validity.AlphaNumericValidity
+import ir.yamin.glitch.validity.NotEmptyValidity
 import ir.yamin.glitch.validity.RegexValidity
 import ir.yamin.glitch.validity.iran.*
 import ir.yamin.glitch.validity.length.LengthValidity
@@ -13,101 +15,174 @@ import ir.yamin.glitch.validity.length.MinimumValidity
 import ir.yamin.glitch.validity.numbers.DecimalValidity
 import ir.yamin.glitch.validity.numbers.DigitValidity
 
+
+/**
+ * base class for Validators
+ *
+ */
 abstract class DataValidator {
     
-    protected var isMultiRule = false
-    private var isSingleGlobalRule = false
-    private var isMultipleGlobalRule = false
+    protected var isMultiRule : Boolean = false
+    private var isSingleGlobalRule : Boolean = false
+    private var isMultipleGlobalRule : Boolean = false
+    
     protected lateinit var singleRule : Rule
+    
     protected var singleRules = mutableListOf<Rule>()
-    protected var validity = true
+    
     private var isIgnoringWhiteSpace = false
     
     private var min : Int? = null
     private var max : Int? = null
     
-    private fun ruleCollision() : Unit = throw IllegalStateException(
-            "It's either multi rule or single rule, you cannot set them both!")
+    protected fun ruleCollision() {
+        if (isSingleGlobalRule && (isMultiRule || isMultipleGlobalRule)) {
+            throw IllegalStateException(RULE_COLLISION)
+        }
+    }
     
+    /**
+     * sets whether ignoring white space or not
+     *
+     * @param ignore true or false
+     */
     open fun ignoreWhiteSpace(ignore : Boolean) = this.apply { isIgnoringWhiteSpace = ignore }
     
+    /**
+     * sets a single rule for all the elements
+     *
+     * @param rule single provided rule
+     */
     open fun withRule(rule : Rule) = this.apply {
         isSingleGlobalRule = true
         singleRule = rule
     }
     
+    /**
+     * sets variable number of rules
+     *
+     * @param rule first rule
+     * @param varRule variable number of rules
+     */
     open fun withRule(rule : Rule, vararg varRule : Rule) = this.apply {
         isMultipleGlobalRule = true
         singleRules.addAll(varRule)
     }
     
+    /**
+     * sets list of rules
+     *
+     * @param rules
+     */
     open fun withRule(rules : List<Rule>) = this.apply {
         isMultipleGlobalRule = true
         singleRules.addAll(rules)
     }
     
-    fun isValid() : Boolean {
-        if (isSingleGlobalRule && isMultiRule) ruleCollision()
-        return when {
+    /**
+     * checks for validity of elements by provided rules
+     *
+     */
+    open fun isValid() : Boolean {
+        ruleCollision()
+        
+        when {
             isMultiRule -> checkMultiRule()
-            isSingleGlobalRule -> checkSingleGlobalRule()
             isMultipleGlobalRule -> checkMultipleGlobalRule()
-            else -> false
+            isSingleGlobalRule -> checkSingleGlobalRule()
         }
+        return false
     }
     
+    /**
+     * check a single rule for a single input string
+     *
+     * @param string input
+     * @param rule rule to check
+     * @return true if provided string match the provided rule
+     */
     protected fun checkRule(string : String, rule : Rule) : Boolean {
         minMaxParadox(rule)
-        val sanitizedInput = if (isIgnoringWhiteSpace) string.replace(Regex(WHITE_SPACE), "") else string
+        val sanitizedInput = whiteSpaceSanitizer(string)
         return when (rule) {
-            Rules.PersianText -> isPersianText(sanitizedInput)
-            Rules.ContainsPersianText -> containsPersianText(sanitizedInput)
+            is Rules.PersianText -> isPersianText(sanitizedInput)
+            is Rules.ContainsPersianText -> containsPersianText(sanitizedInput)
     
-            Rules.PersianNumber -> isPersianNumber(sanitizedInput)
-            Rules.ContainsPersianNumber -> containsPersianNumber(sanitizedInput)
+            is Rules.PersianNumber -> isPersianNumber(sanitizedInput)
+            is Rules.ContainsPersianNumber -> containsPersianNumber(sanitizedInput)
     
-            Rules.ArabicNumber -> isArabicNumber(sanitizedInput)
-            Rules.ContainsArabicNumber -> containsArabicNumber(sanitizedInput)
+            is Rules.ArabicNumber -> isArabicNumber(sanitizedInput)
+            is Rules.ContainsArabicNumber -> containsArabicNumber(sanitizedInput)
     
-            Rules.Digit -> isDigit(sanitizedInput)
-            Rules.ContainsDigit -> containsDigit(sanitizedInput)
+            is Rules.Digit -> isDigit(sanitizedInput)
+            is Rules.ContainsDigit -> containsDigit(sanitizedInput)
     
-            Rules.AlphaNumeric -> isAlphaNumeric(sanitizedInput)
-            Rules.ContainsAlphaNumeric -> containsAlphaNumeric(sanitizedInput)
+            is Rules.AlphaNumeric -> isAlphaNumeric(sanitizedInput)
+            is Rules.ContainsAlphaNumeric -> containsAlphaNumeric(sanitizedInput)
     
-            Rules.Decimal -> isDecimal(sanitizedInput)
-            Rules.ContainsDecimal -> containsDecimal(sanitizedInput)
+            is Rules.Decimal -> isDecimal(sanitizedInput)
+            is Rules.ContainsDecimal -> containsDecimal(sanitizedInput)
     
-            Rules.IranMobile -> isIranMobile(sanitizedInput)
-            Rules.ContainsIranMobile -> containsIranMobile(sanitizedInput)
+            is Rules.IranMobile -> isIranMobile(sanitizedInput)
+            is Rules.ContainsIranMobile -> containsIranMobile(sanitizedInput)
     
-            Rules.IranNationalCode -> isIranNationalCode(sanitizedInput)
+            is Rules.IranNationalCode -> isIranNationalCode(sanitizedInput)
+    
+            is Rules.NotEmpty -> isNotEmpty(sanitizedInput)
     
             is Rules.Length.Exact -> isExactLength(sanitizedInput, rule.length)
             is Rules.Length.Max -> isMaxLength(sanitizedInput, rule.max)
             is Rules.Length.Min -> isMinLength(sanitizedInput, rule.min)
     
-            is RegexRule -> RegexValidity(sanitizedInput, rule.pattern).isValid()
+            is Rules.Regex -> RegexValidity(sanitizedInput, rule.pattern).isValid()
     
-            is CustomRule -> rule.logic()
+            is Rules.Custom -> rule.logic()
+            
             else -> false
         }
     }
     
+    /**
+     * deletes white space
+     *
+     * @param string input string
+     * @return a string with no white space
+     */
+    private fun whiteSpaceSanitizer(string : String) : String {
+        return if (isIgnoringWhiteSpace) string.replace(Regex(WHITE_SPACE), "") else string
+    }
+    
+    /**
+     * checks whether provided min or max value are valid and logical
+     * in other words min cannot be greater than max
+     *
+     * @param rule
+     */
     private fun minMaxParadox(rule : Rule) {
-        if (min != null && max != null && min!! > max!!) {
-            throw IllegalStateException("Minimum cannot be greater than Maximum!")
-        } else {
+        if (min != null && max != null && min!! > max!!) throw IllegalStateException(MINIMUM_MAXIMUM)
+        else {
             if (rule is Rules.Length.Min) min = rule.min
             if (rule is Rules.Length.Max) max = rule.max
         }
     }
     
-    protected abstract fun checkSingleGlobalRule() : Boolean
+    /**
+     * Check single global rule
+     *
+     */
+    protected open fun checkSingleGlobalRule() {}
     
-    protected abstract fun checkMultipleGlobalRule() : Boolean
+    /**
+     * Check multiple global rule
+     *
+     */
+    protected open fun checkMultipleGlobalRule() {}
     
-    protected abstract fun checkMultiRule() : Boolean
+    /**
+     * Check multi rule
+     *
+     */
+    protected open fun checkMultiRule() {}
     
     companion object {
         
@@ -154,5 +229,7 @@ abstract class DataValidator {
         fun isExactLength(string : String, exact : Int) = LengthValidity(string, exact).isValid()
         fun isMinLength(string : String, min : Int) = MinimumValidity(string, min).isValid()
         fun isMaxLength(string : String, max : Int) = MaximumValidity(string, max).isValid()
+        
+        fun isNotEmpty(string : String) = NotEmptyValidity(string).isValid()
     }
 }

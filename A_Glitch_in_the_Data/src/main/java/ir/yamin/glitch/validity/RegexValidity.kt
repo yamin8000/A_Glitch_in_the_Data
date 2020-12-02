@@ -1,11 +1,13 @@
 package ir.yamin.glitch.validity
 
-internal open class RegexValidity(input : String, pattern : String) : Validity(input) {
+import ir.yamin.glitch.util.CONSTANTS.REGEX_PATTERN
+
+internal open class RegexValidity(input : String, pattern : String) : BaseValidity(input) {
     
     private val regex : Regex
     
     init {
-        if (pattern.isBlank()) throw IllegalStateException("regex pattern can not be null")
+        if (pattern.isBlank()) throw IllegalStateException(REGEX_PATTERN)
         regex = Regex(pattern)
     }
     

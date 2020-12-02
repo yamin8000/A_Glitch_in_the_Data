@@ -1,11 +1,12 @@
 package ir.yamin.glitch.validity.length
 
-import ir.yamin.glitch.validity.Validity
+import ir.yamin.glitch.util.CONSTANTS.ZERO_MAX
+import ir.yamin.glitch.validity.BaseValidity
 
-internal class MaximumValidity(input : String, private var max : Int) : Validity(input) {
+internal class MaximumValidity(input : String, private var max : Int) : BaseValidity(input) {
     
     override fun isValid() : Boolean {
-        if (max < 0) throw IllegalArgumentException("max cannot be less than zero!")
+        if (max < 0) throw IllegalArgumentException(ZERO_MAX)
         return input.length <= max
     }
 }

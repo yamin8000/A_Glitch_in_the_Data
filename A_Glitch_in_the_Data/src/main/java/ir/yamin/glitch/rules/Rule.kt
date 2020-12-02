@@ -1,3 +1,11 @@
 package ir.yamin.glitch.rules
 
-abstract class Rule
+/**
+ * base Rule class
+ *
+ */
+abstract class Rule {
+    
+    abstract val name : String
+    abstract val error : String
+}
