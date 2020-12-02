@@ -14,7 +14,7 @@ class FormElement {
     private var elementEditText : EditText? = null
     private var elementInputLayout : TextInputLayout? = null
     var error : String = ""
-    var isErrorEnabled = false
+    var isErrorEnabled = true
     private var hint : String = ""
     var validity = false
     var name = ""
