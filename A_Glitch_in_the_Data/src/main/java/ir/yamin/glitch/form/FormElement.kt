@@ -5,8 +5,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 /**
- * a Form element is consist of input field
- * which can be EditText, TextInputEditText, TextInputLayout
+ * a Form element is consist of element itself
+ * which can be EditText, TextInputEditText, TextInputLayout, CheckBox , SwitchCompat, ...
  * and element validity
  */
 class FormElement {
