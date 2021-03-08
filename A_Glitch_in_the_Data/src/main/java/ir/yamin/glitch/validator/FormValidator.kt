@@ -39,13 +39,9 @@ class FormValidator : DataValidator() {
      * @param element single rule
      * @param varElement more rules in variable argument format
      */
-    fun add(element : FormElement?, vararg varElement : FormElement?) = this.apply {
-        if (element == null) throw NullPointerException()
+    fun add(element : FormElement, vararg varElement : FormElement) = this.apply {
         elements.add(element)
-        varElement.forEach { element ->
-            if (element == null) throw NullPointerException()
-            elements.add(element)
-        }
+        add(varElement.asList())
     }
     
     /**
@@ -53,11 +49,8 @@ class FormValidator : DataValidator() {
      *
      * @param elementList lists of elements
      */
-    fun add(elementList : List<FormElement?>) = this.apply {
-        elementList.forEach { element ->
-            if (element == null) throw NullPointerException()
-            elements.add(element)
-        }
+    fun add(elementList : List<FormElement>) = this.apply {
+        elementList.forEach { element -> elements.add(element) }
     }
     
     /**
@@ -67,8 +60,7 @@ class FormValidator : DataValidator() {
      * @param rule at least one rule is needed
      * @param rules more rules
      */
-    fun addWithRule(element : FormElement?, rule : Rule, vararg rules : Rule) = this.apply {
-        if (element == null) throw NullPointerException()
+    fun addWithRule(element : FormElement, rule : Rule, vararg rules : Rule) = this.apply {
         elementAndRule[element] = listOf(rule).plus(rules)
         isMultiRule = true
     }
@@ -78,10 +70,9 @@ class FormValidator : DataValidator() {
      *
      * @param elementAndRule a map consist of pairs of element and rule
      */
-    fun addWithRule(elementAndRule : Map<FormElement?, Rule>) = this.apply {
+    fun addWithRule(elementAndRule : Map<FormElement, Rule>) = this.apply {
         this.elementAndRule.putAll(elementAndRule.entries.associate { entry ->
-            if (entry.key == null) throw NullPointerException()
-            entry.key!! to listOf(entry.value)
+            entry.key to listOf(entry.value)
         })
         isMultiRule = true
     }
@@ -92,8 +83,9 @@ class FormValidator : DataValidator() {
      * @param element single element
      * @param rules list of rules
      */
-    fun addWithRule(element : FormElement?, rules : List<Rule>) = this.apply {
-        if (element == null || rules.isEmpty()) throw NullPointerException()
+    fun addWithRule(element : FormElement, rules : List<Rule>) = this.apply {
+        //if (element == null || rules.isEmpty()) throw NullPointerException()
+        if (rules.isEmpty()) throw IllegalStateException("You should at least enter one rule!")
         elementAndRule[element] = rules
         isMultiRule = true
     }
