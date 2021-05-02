@@ -2,7 +2,7 @@
 # A Glitch in the Data
 
 > A no-nonsense Android Library for Form Validation and String Matching
-
+  [![Build](https://api.travis-ci.com/yamin8000/A_Glitch_in_the_Data.svg?branch=master)](https://travis-ci.com/github/yamin8000/A_Glitch_in_the_Data)
 |-|-|
 |--|--|
 |📺|[Preview](#Preview)|
