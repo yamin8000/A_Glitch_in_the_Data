@@ -145,7 +145,7 @@ dependencies {
 ```
 ### Maven
 **Step 1.** Add the JitPack repository to your build file
-```markup
+```xml
 	<repositories>
 		<repository>
 		    <id>jitpack.io</id>
@@ -154,7 +154,7 @@ dependencies {
 	</repositories>
 ```
 **Step 2.** Add the dependency
-```markup
+```xml
 	<dependency>
 	    <groupId>com.github.yamin8000</groupId>
 	    <artifactId>A_Glitch_in_the_Data</artifactId>
@@ -171,8 +171,8 @@ dependencies {
  - Currently only `EditText`, `TextInputEditText`, `TextInputLayout` are supported
  - Submit button subscription
 ## Changelog
- - 0.0.1 first build
- - 0.0.2 bug fix
+ - **0.0.1** first build
+ - **0.0.2** bug fix
 ## Credits
 Inspired by [Dhaval2404](https://github.com/Dhaval2404) / **[android-form-validation](https://github.com/Dhaval2404/android-form-validation)**
 ## Contribution
