@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package ir.yamin.glitch.validator
 
 import android.text.Editable
@@ -6,7 +8,6 @@ import android.widget.Button
 import android.widget.EditText
 import ir.yamin.glitch.form.FormElement
 import ir.yamin.glitch.rules.Rule
-
 
 /**
  * Form Validator class
@@ -149,12 +150,12 @@ class FormValidator : DataValidator() {
                 override fun beforeTextChanged(s : CharSequence?, start : Int, count : Int, after : Int) {
                     if (element.key.isInputLayout) element.key.clearError()
                 }
-    
+                
                 override fun onTextChanged(s : CharSequence?, start : Int, before : Int, count : Int) {
                     validity = isValid()
                     if (submitButton != null) submitButton!!.isEnabled = validity
                 }
-    
+                
                 override fun afterTextChanged(s : Editable?) {
                     validity = isValid()
                     if (submitButton != null) submitButton!!.isEnabled = validity

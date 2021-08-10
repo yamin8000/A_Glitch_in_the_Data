@@ -1,6 +1,6 @@
 package ir.yamin.glitch.util
 
-object RegexPatterns {
+internal object RegexPatterns {
     
     const val WHITE_SPACE = """\s+"""
     const val PERSIAN_NUMBERS = """[۰-۹]+"""

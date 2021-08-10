@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package ir.yamin.glitch.validator
 
 import ir.yamin.glitch.rules.Rule

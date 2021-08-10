@@ -15,11 +15,11 @@ import ir.yamin.glitch.validity.length.MinimumValidity
 import ir.yamin.glitch.validity.numbers.DecimalValidity
 import ir.yamin.glitch.validity.numbers.DigitValidity
 
-
 /**
  * base class for Validators
  *
  */
+@Suppress("unused")
 abstract class DataValidator {
     
     protected var isMultiRule : Boolean = false
@@ -107,35 +107,35 @@ abstract class DataValidator {
         return when (rule) {
             is Rules.PersianText -> isPersianText(sanitizedInput)
             is Rules.ContainsPersianText -> containsPersianText(sanitizedInput)
-    
+            
             is Rules.PersianNumber -> isPersianNumber(sanitizedInput)
             is Rules.ContainsPersianNumber -> containsPersianNumber(sanitizedInput)
-    
+            
             is Rules.ArabicNumber -> isArabicNumber(sanitizedInput)
             is Rules.ContainsArabicNumber -> containsArabicNumber(sanitizedInput)
-    
+            
             is Rules.Digit -> isDigit(sanitizedInput)
             is Rules.ContainsDigit -> containsDigit(sanitizedInput)
-    
+            
             is Rules.AlphaNumeric -> isAlphaNumeric(sanitizedInput)
             is Rules.ContainsAlphaNumeric -> containsAlphaNumeric(sanitizedInput)
-    
+            
             is Rules.Decimal -> isDecimal(sanitizedInput)
             is Rules.ContainsDecimal -> containsDecimal(sanitizedInput)
-    
+            
             is Rules.IranMobile -> isIranMobile(sanitizedInput)
             is Rules.ContainsIranMobile -> containsIranMobile(sanitizedInput)
-    
+            
             is Rules.IranNationalCode -> isIranNationalCode(sanitizedInput)
-    
+            
             is Rules.NotEmpty -> isNotEmpty(sanitizedInput)
-    
+            
             is Rules.Length.Exact -> isExactLength(sanitizedInput, rule.length)
             is Rules.Length.Max -> isMaxLength(sanitizedInput, rule.max)
             is Rules.Length.Min -> isMinLength(sanitizedInput, rule.min)
-    
+            
             is Rules.Regex -> RegexValidity(sanitizedInput, rule.pattern).isValid()
-    
+            
             is Rules.Custom -> rule.logic()
             
             else -> false

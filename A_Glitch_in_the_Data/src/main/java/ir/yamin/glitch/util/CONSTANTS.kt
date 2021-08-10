@@ -1,6 +1,6 @@
 package ir.yamin.glitch.util
 
-object CONSTANTS {
+internal object CONSTANTS {
     
     const val RULE_COLLISION = "It's either multi rule or single rule, you cannot set them both!"
     const val MINIMUM_MAXIMUM = "Minimum cannot be greater than Maximum!"
